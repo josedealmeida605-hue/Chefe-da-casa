@@ -1,0 +1,851 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdminAppHub - Plataforma de Gerenciamento de Apps</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --accent: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f72585;
+            --danger: #e63946;
+            --sidebar-width: 250px;
+            --header-height: 70px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fb;
+            color: var(--dark);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            overflow-y: auto;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+        
+        .menu-item {
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .menu-item:hover, .menu-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 3px solid var(--accent);
+        }
+        
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+        }
+        
+        /* Header */
+        .header {
+            height: var(--header-height);
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-left h1 {
+            font-size: 1.5rem;
+            color: var(--dark);
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        /* Content Area */
+        .content {
+            padding: 2rem;
+        }
+        
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .card-icon.apps {
+            background: var(--primary);
+        }
+        
+        .card-icon.sales {
+            background: var(--success);
+        }
+        
+        .card-icon.users {
+            background: var(--warning);
+        }
+        
+        .card-icon.revenue {
+            background: var(--accent);
+        }
+        
+        .card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .card p {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        /* Section Styling */
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            color: var(--dark);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .btn:hover {
+            background-color: var(--secondary);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+        }
+        
+        /* Table Styling */
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-published {
+            background: #e7f7ef;
+            color: #1ea97c;
+        }
+        
+        .status-pending {
+            background: #fff4e6;
+            color: #f2994a;
+        }
+        
+        .status-draft {
+            background: #f2f2f2;
+            color: #6c757d;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .action-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .edit-btn {
+            background: #e3f2fd;
+            color: var(--primary);
+        }
+        
+        .delete-btn {
+            background: #ffebee;
+            color: var(--danger);
+        }
+        
+        .view-btn {
+            background: #e8f5e9;
+            color: var(--success);
+        }
+        
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        /* Testing Area */
+        .testing-area {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 1.5rem;
+        }
+        
+        .device-preview {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .device-frame {
+            width: 250px;
+            height: 500px;
+            background: #333;
+            border-radius: 30px;
+            padding: 15px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .device-screen {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .device-status-bar {
+            height: 25px;
+            background: #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 10px;
+            align-items: center;
+            font-size: 12px;
+        }
+        
+        .app-display {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .test-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .control-group {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+        }
+        
+        .control-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+                overflow: visible;
+            }
+            
+            .sidebar-header h2, .menu-item span {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+                width: calc(100% - 70px);
+            }
+            
+            .testing-area {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-cards {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                padding: 0 1rem;
+            }
+            
+            .content {
+                padding: 1rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <i class="fas fa-rocket"></i>
+            <h2>AdminAppHub</h2>
+        </div>
+        <div class="sidebar-menu">
+            <div class="menu-item active">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="menu-item">
+                <i class="fas fa-mobile-alt"></i>
+                <span>Meus Apps</span>
+            </div>
+            <div class="menu-item">
+                <i class="fas fa-store"></i>
+                <span>Loja</span>
+            </div>
+            <div class="menu-item">
+                <i class="fas fa-vial"></i>
+                <span>Testar Apps</span>
+            </div>
+            <div class="menu-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Relatórios</span>
+            </div>
+            <div class="menu-item">
+                <i class="fas fa-users"></i>
+                <span>Usuários</span>
+            </div>
+            <div class="menu-item">
+                <i class="fas fa-cog"></i>
+                <span>Configurações</span>
+            </div>
+            <div class="menu-item">
+                <i class="fas fa-question-circle"></i>
+                <span>Ajuda</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <h1>Painel de Administração</h1>
+            </div>
+            <div class="header-right">
+                <div class="admin-profile">
+                    <div class="admin-avatar">AD</div>
+                    <div>
+                        <div style="font-weight: 600;">Administrador</div>
+                        <div style="font-size: 0.8rem; color: #6c757d;">admin@apphub.com</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Dashboard Cards -->
+            <div class="dashboard-cards">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3>24</h3>
+                            <p>Apps Publicados</p>
+                        </div>
+                        <div class="card-icon apps">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3>1.248</h3>
+                            <p>Vendas Totais</p>
+                        </div>
+                        <div class="card-icon sales">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3>5.672</h3>
+                            <p>Usuários Ativos</p>
+                        </div>
+                        <div class="card-icon users">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3>R$ 12.847</h3>
+                            <p>Receita Total</p>
+                        </div>
+                        <div class="card-icon revenue">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Apps Management Section -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Gerenciar Apps</h2>
+                    <button class="btn"><i class="fas fa-plus"></i> Adicionar App</button>
+                </div>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome do App</th>
+                                <th>Categoria</th>
+                                <th>Status</th>
+                                <th>Downloads</th>
+                                <th>Receita</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>App Financeiro Pro</td>
+                                <td>Finanças</td>
+                                <td><span class="status status-published">Publicado</span></td>
+                                <td>1,248</td>
+                                <td>R$ 2,499</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <div class="action-btn edit-btn"><i class="fas fa-edit"></i></div>
+                                        <div class="action-btn delete-btn"><i class="fas fa-trash"></i></div>
+                                        <div class="action-btn view-btn"><i class="fas fa-eye"></i></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Jogo Puzzle Master</td>
+                                <td>Jogos</td>
+                                <td><span class="status status-published">Publicado</span></td>
+                                <td>3,472</td>
+                                <td>R$ 1,736</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <div class="action-btn edit-btn"><i class="fas fa-edit"></i></div>
+                                        <div class="action-btn delete-btn"><i class="fas fa-trash"></i></div>
+                                        <div class="action-btn view-btn"><i class="fas fa-eye"></i></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Receitas Gourmet</td>
+                                <td>Culinária</td>
+                                <td><span class="status status-pending">Pendente</span></td>
+                                <td>0</td>
+                                <td>R$ 0</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <div class="action-btn edit-btn"><i class="fas fa-edit"></i></div>
+                                        <div class="action-btn delete-btn"><i class="fas fa-trash"></i></div>
+                                        <div class="action-btn view-btn"><i class="fas fa-eye"></i></div>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Meditação Guiada</td>
+                                <td>Saúde</td>
+                                <td><span class="status status-draft">Rascunho</span></td>
+                                <td>0</td>
+                                <td>R$ 0</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <div class="action-btn edit-btn"><i class="fas fa-edit"></i></div>
+                                        <div class="action-btn delete-btn"><i class="fas fa-trash"></i></div>
+                                        <div class="action-btn view-btn"><i class="fas fa-eye"></i></div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Testing Area -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Área de Testes</h2>
+                    <div>
+                        <button class="btn"><i class="fas fa-download"></i> Carregar App</button>
+                        <button class="btn btn-success"><i class="fas fa-play"></i> Executar Testes</button>
+                    </div>
+                </div>
+                <div class="testing-area">
+                    <div class="device-preview">
+                        <div class="device-frame">
+                            <div class="device-screen">
+                                <div class="device-status-bar">
+                                    <span>9:41</span>
+                                    <span>📶 🔋</span>
+                                </div>
+                                <div class="app-display">
+                                    <div style="text-align: center;">
+                                        <h3>App em Teste</h3>
+                                        <p>Selecione um app para testar</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="test-controls">
+                            <div class="control-group">
+                                <span class="control-title">Dispositivo</span>
+                                <select class="form-control">
+                                    <option>iPhone 14 Pro</option>
+                                    <option>Samsung Galaxy S23</option>
+                                    <option>Google Pixel 7</option>
+                                    <option>iPad Pro</option>
+                                </select>
+                            </div>
+                            <div class="control-group">
+                                <span class="control-title">App para Testar</span>
+                                <select class="form-control">
+                                    <option>Selecione um app</option>
+                                    <option>App Financeiro Pro</option>
+                                    <option>Jogo Puzzle Master</option>
+                                    <option>Receitas Gourmet</option>
+                                    <option>Meditação Guiada</option>
+                                </select>
+                            </div>
+                            <div class="control-group">
+                                <span class="control-title">Ações de Teste</span>
+                                <div style="display: flex; gap: 5px; margin-top: 10px;">
+                                    <button class="btn" style="flex: 1;"><i class="fas fa-redo"></i> Reiniciar</button>
+                                    <button class="btn btn-warning" style="flex: 1;"><i class="fas fa-bug"></i> Debug</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="control-group">
+                            <span class="control-title">Logs de Teste</span>
+                            <div style="background: #2d3748; color: #e2e8f0; padding: 1rem; border-radius: 5px; height: 300px; overflow-y: auto; font-family: monospace; font-size: 0.8rem;">
+                                <div>> Sistema de testes inicializado</div>
+                                <div>> Aguardando seleção de app...</div>
+                                <div>> Nenhum erro detectado</div>
+                                <div>> Pronto para executar testes</div>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <span class="control-title">Relatório de Testes</span>
+                            <button class="btn" style="width: 100%; margin-top: 10px;"><i class="fas fa-file-pdf"></i> Gerar Relatório</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add/Edit App Form -->
+            <div class="section">
+                <div class="section-header">
+                    <h2 class="section-title">Adicionar Novo App</h2>
+                </div>
+                <form>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Nome do App</label>
+                            <input type="text" class="form-control" placeholder="Digite o nome do app">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Categoria</label>
+                            <select class="form-control">
+                                <option>Selecione uma categoria</option>
+                                <option>Produtividade</option>
+                                <option>Jogos</option>
+                                <option>Educação</option>
+                                <option>Saúde</option>
+                                <option>Finanças</option>
+                                <option>Entretenimento</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Descrição</label>
+                        <textarea class="form-control" placeholder="Descreva o seu app"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Preço (R$)</label>
+                            <input type="number" class="form-control" placeholder="0,00" step="0.01" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Versão</label>
+                            <input type="text" class="form-control" placeholder="ex: 1.0.0">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Upload do App</label>
+                        <input type="file" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Imagens do App</label>
+                        <input type="file" class="form-control" multiple>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 1.5rem;">
+                        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Salvar App</button>
+                        <button type="button" class="btn"><i class="fas fa-times"></i> Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulação de funcionalidades do admin
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ativação dos itens do menu
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    menuItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // Simulação de logs de teste
+            const logContainer = document.querySelector('.control-group:last-child div');
+            const runTestsBtn = document.querySelector('.btn-success');
+            
+            runTestsBtn.addEventListener('click', function() {
+                logContainer.innerHTML = '';
+                addLog('> Iniciando testes automatizados...');
+                
+                setTimeout(() => addLog('> Teste de interface: OK'), 1000);
+                setTimeout(() => addLog('> Teste de funcionalidades: OK'), 2000);
+                setTimeout(() => addLog('> Teste de performance: OK'), 3000);
+                setTimeout(() => addLog('> Teste de segurança: OK'), 4000);
+                setTimeout(() => addLog('> Todos os testes passaram!'), 5000);
+            });
+            
+            function addLog(message) {
+                const logEntry = document.createElement('div');
+                logEntry.textContent = message;
+                logContainer.appendChild(logEntry);
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+        });
+    </script>
+</body>
+</html>
+	
